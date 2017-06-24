@@ -1,0 +1,134 @@
+<!--src:Coding "Snake" in 4 min 30 sec (plain browser JavaScript)(https://www.youtube.com/watch?v=xGmXxpIj6vs)-->
+<canvas id="gc" width="400" height="400"></canvas>
+<div>
+    <span id="statusDiv"></span>
+    <span>(N/B to toggle)</span>
+</div>
+<div>
+    <span>Score:</span>
+    <span id="scoreDiv"></span>
+</div>
+<div>
+    <span>HighScore:</span>
+    <span id="highScoreDiv">0</span>
+</div>
+<div>
+    <span>Length:</span>
+    <span id="lengthDiv"></span>
+</div>
+<script>
+window.onload=function() {
+    canv=document.getElementById("gc");
+    var status=document.getElementById("statusDiv");
+    status.innerHTML = "Normal mode";
+    ctx=canv.getContext("2d");
+    document.addEventListener("keydown",keyPush);
+    clock = setInterval(game,1000/speed);
+}
+score = 0;
+highScore = 0;
+initSpeed = 5;
+incSpeed = 1;
+speed=initSpeed;
+px=py=10;
+gs=tc=20;
+ax=ay=15;
+xv=yv=0;
+trail=[];
+tail = 5;
+function game() {
+    px+=xv;
+    py+=yv;
+    if(px<0) {
+        px= tc-1;
+    }
+    if(px>tc-1) {
+        px= 0;
+    }
+    if(py<0) {
+        py= tc-1;
+    }
+    if(py>tc-1) {
+        py= 0;
+    }
+    ctx.fillStyle="black";
+    ctx.fillRect(0,0,canv.width,canv.height);
+ 
+    ctx.fillStyle="lime";
+    for(var i=0;i<trail.length;i++) {
+        ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
+        if(trail[i].x==px && trail[i].y==py) {
+            tail = 5;
+            setSpeed(initSpeed);
+        }
+    }
+    trail.push({x:px,y:py});
+    while(trail.length>tail) {
+        trail.shift();
+    }
+ 
+    if(ax==px && ay==py) {
+        tail++;
+        setSpeed(speed+incSpeed);
+        ax=Math.floor(Math.random()*tc);
+        ay=Math.floor(Math.random()*tc);
+    }
+    ctx.fillStyle="red";
+    ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
+}
+function setSpeed(spd){
+    score = (spd == initSpeed) ? 0 : score+1;
+    var scr=document.getElementById("scoreDiv");
+    scr.innerHTML = score;
+    if (score > highScore){
+        highScore = score;
+        var hscr=document.getElementById("highScoreDiv");
+        hscr.innerHTML = highScore;
+    }
+    var lngth=document.getElementById("lengthDiv");
+    lngth.innerHTML = tail;
+    speed = spd;
+    window.clearInterval(clock);
+    clock = window.setInterval(game,1000/speed);
+}
+function keyPush(evt) {
+    switch(evt.keyCode) {
+        case 37:
+        	if (!(xv==1 && yv==0)){
+            	xv=-1; yv=0;
+        	}
+            break;
+        case 38:
+        	if (!(xv==0 && yv===1)){
+            	xv=0; yv=-1;
+        	}
+            break;
+        case 39:
+        	if (!(xv==-1 && yv==0)){
+            	xv=1; yv=0;
+        	}
+            break;
+        case 40:
+        	if (!(xv==0 && yv==-1)){
+            	xv=0; yv=1;
+        	}
+            break;
+        case 78:
+            var status=document.getElementById("statusDiv");
+            status.innerHTML = "Normal mode";
+            initSpeed = 5;
+            incSpeed = 0.5;
+            tail = 5;
+            setSpeed(initSpeed);
+            break;
+        case 66:
+            var status=document.getElementById("statusDiv");
+            status.innerHTML = "Beast mode";
+            initSpeed = 15;
+            incSpeed = 0;
+            tail = 5;
+            setSpeed(initSpeed);
+            break;
+    }
+}
+</script>
